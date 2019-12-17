@@ -1,10 +1,17 @@
 package com.realityexpander.okhttpinstana;
 
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
+
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
 import net.bytebuddy.dynamic.loading.ClassReloadingStrategy;
+import net.bytebuddy.implementation.FixedValue;
 import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.matcher.ElementMatchers;
+
+import java.util.function.Function;
 
 import static net.bytebuddy.matcher.ElementMatchers.isDeclaredBy;
 import static net.bytebuddy.matcher.ElementMatchers.named;
@@ -31,7 +38,23 @@ public class OkHttpInstana {
 
 
 
+//    @RequiresApi(api = Build.VERSION_CODES.N)
     public void test() {
+
+//        Class<? extends java.util.function.Function> dynamicType = new ByteBuddy()
+//                .subclass(java.util.function.Function.class)
+//                .method(ElementMatchers.named("apply"))
+//                .intercept(MethodDelegation.to(new GreetingInterceptor()))
+//                .make()
+//                .load(getClass().getClassLoader())
+//                .getLoaded();
+//        try {
+//            assertThat((String) dynamicType.newInstance().apply("Byte Buddy"), is("Hello from Byte Buddy"));
+//        } catch (IllegalAccessException e) {
+//            e.printStackTrace();
+//        } catch (InstantiationException e) {
+//            e.printStackTrace();
+//        }
 
         String helloWorld = null;
         try {
@@ -50,6 +73,23 @@ public class OkHttpInstana {
         }
 
         System.out.println(helloWorld);
+
+//
+//        Class<?> dynamicType = new ByteBuddy()
+//                .subclass(Object.class)
+//                .method(ElementMatchers.named("toString"))
+//                .intercept(FixedValue.value("Hello World!"))
+//                .make()
+//                .load(getClass().getClassLoader())
+//                .getLoaded();
+//        try {
+//            assertThat(dynamicType.newInstance().toString(), is("Hello World!"));
+//        } catch (IllegalAccessException e) {
+//            e.printStackTrace();
+//        } catch (InstantiationException e) {
+//            e.printStackTrace();
+//        }
+
 
 //        try {
 //            String r = new ByteBuddy()

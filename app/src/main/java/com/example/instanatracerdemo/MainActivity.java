@@ -12,7 +12,16 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.realityexpander.okhttpinstana.Bar;
+import com.realityexpander.okhttpinstana.Foo;
 import com.realityexpander.okhttpinstana.OkHttpInstana;
+
+import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.implementation.MethodDelegation;
+
+import static net.bytebuddy.matcher.ElementMatchers.isDeclaredBy;
+import static net.bytebuddy.matcher.ElementMatchers.named;
+import static net.bytebuddy.matcher.ElementMatchers.returns;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -24,7 +33,27 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         OkHttpInstana client = new OkHttpInstana();
-        client.test();
+        //client.test();
+
+        try {
+            String r = new ByteBuddy()
+                    .subclass(Foo.class)
+                    .method(named("sayHelloFoo")
+                            .and(isDeclaredBy(Foo.class)
+                                    .and(returns(String.class))))
+                    .intercept(MethodDelegation.to(Bar.class))
+                    .make()
+                    .load(getClass().getClassLoader())
+                    .getLoaded()
+                    .newInstance()
+                    .sayHelloFoo();
+
+            System.out.println(r);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        }
 
 
         // create a new volley request queue with an OkHttp stack
