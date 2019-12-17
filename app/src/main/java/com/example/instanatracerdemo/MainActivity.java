@@ -12,12 +12,16 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.realityexpander.okhttpinstana.Bar;
-import com.realityexpander.okhttpinstana.Foo;
 import com.realityexpander.okhttpinstana.OkHttpInstana;
 
 import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.ClassFileVersion;
+import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
 import net.bytebuddy.implementation.MethodDelegation;
+import net.bytebuddy.implementation.bind.annotation.SuperCall;
+import net.bytebuddy.matcher.ElementMatchers;
+
+import java.util.concurrent.Callable;
 
 import static net.bytebuddy.matcher.ElementMatchers.isDeclaredBy;
 import static net.bytebuddy.matcher.ElementMatchers.named;
@@ -35,25 +39,26 @@ public class MainActivity extends AppCompatActivity {
         OkHttpInstana client = new OkHttpInstana();
         //client.test();
 
-        try {
-            String r = new ByteBuddy()
-                    .subclass(Foo.class)
-                    .method(named("sayHelloFoo")
-                            .and(isDeclaredBy(Foo.class)
-                                    .and(returns(String.class))))
-                    .intercept(MethodDelegation.to(Bar.class))
-                    .make()
-                    .load(getClass().getClassLoader())
-                    .getLoaded()
-                    .newInstance()
-                    .sayHelloFoo();
 
-            System.out.println(r);
+        Class<? extends MyService> serviceClass = new ByteBuddy()
+                .subclass(MyService.class)
+                .method(ElementMatchers.named("sayFoo").or(ElementMatchers.named("sayBar")))
+                .intercept(MethodDelegation.to(MyServiceInterceptor.class))
+                .make()
+                .load(MainActivity.class.getClassLoader(), ClassLoadingStrategy.Default.WRAPPER)
+                .getLoaded();
+
+        MyService service = null;
+        try {
+            service = serviceClass.newInstance();
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InstantiationException e) {
             e.printStackTrace();
         }
+
+        service.sayFoo();
+        service.sayBar();
 
 
         // create a new volley request queue with an OkHttp stack
